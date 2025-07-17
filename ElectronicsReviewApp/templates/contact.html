@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - Electronics Review{% endblock %}
+
+{% block keywords %}Contact, Electronics Review, Customer Service, Support{% endblock %}
+
+{% block description %}Contact Electronics Review for support, inquiries, or feedback{% endblock %}
+
+{% block extra_css %}
+<style>
+    .contact-form {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 10px;
+    }
+    
+    .contact-info {
+        background: #007bff;
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+    
+    .contact-info h4 {
+        color: white;
+        margin-bottom: 20px;
+    }
+    
+    .contact-info p {
+        margin-bottom: 10px;
+    }
+    
+    .contact-info i {
+        width: 20px;
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <!-- Contact Start -->
+    <div class="container-fluid">
+        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Contact Us</span></h2>
+        <div class="row px-xl-5">
+            <div class="col-lg-7 mb-5">
+                <div class="contact-form bg-light p-30">
+                    <!-- Display messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Show form errors if any -->
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <ul>
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ field }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="control-group">
+                            {{ form.name }}
+                            <p class="help-block text-danger"></p>
+                        </div>
+                        <div class="control-group">
+                            {{ form.email }}
+                            <p class="help-block text-danger"></p>
+                        </div>
+                        <div class="control-group">
+                            {{ form.subject }}
+                            <p class="help-block text-danger"></p>
+                        </div>
+                        <div class="control-group">
+                            {{ form.message }}
+                            <p class="help-block text-danger"></p>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary py-2 px-4" type="submit">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-5 mb-5">
+                <div class="bg-light p-30 mb-30">
+                    <iframe style="width: 100%; height: 250px;"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2943394.7879270036!2d-87.33682!3d44.31847!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4d4caa3dc7ca0411%3A0x97dd48597a62c9b3!2sMichigan%2C%20USA!5e0!3m2!1sen!2sus!4v1704294000000!5m2!1sen!2sus"
+                    frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+                </div>
+                <div class="bg-light p-30 mb-3">
+                    <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>Electronics Review Store, Detroit, Michigan, USA</p>
+                    <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@electronicsreview.com</p>
+                    <p class="mb-2"><i class="fa fa-phone-alt text-primary mr-3"></i>+1 (313) 555-0123</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Contact End -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Contact form validation
+    $(document).ready(function() {
+        $('.contact-form form').on('submit', function(e) {
+            var isValid = true;
+            
+            // Clear previous errors
+            $('.help-block').text('');
+            
+            // Validate name
+            if ($('#id_name').val().trim() === '') {
+                $('#id_name').next('.help-block').text('Name is required');
+                isValid = false;
+            }
+            
+            // Validate email
+            var email = $('#id_email').val().trim();
+            if (email === '') {
+                $('#id_email').next('.help-block').text('Email is required');
+                isValid = false;
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                $('#id_email').next('.help-block').text('Please enter a valid email address');
+                isValid = false;
+            }
+            
+            // Validate subject
+            if ($('#id_subject').val().trim() === '') {
+                $('#id_subject').next('.help-block').text('Subject is required');
+                isValid = false;
+            }
+            
+            // Validate message
+            if ($('#id_message').val().trim() === '') {
+                $('#id_message').next('.help-block').text('Message is required');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock %}

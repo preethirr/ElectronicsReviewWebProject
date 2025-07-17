@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Category - Electronics Review{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-container {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 50px 0;
+    }
+    
+    .delete-card {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border: 1px solid #ddd;
+        text-align: center;
+        max-width: 500px;
+    }
+    
+    .delete-card .warning-icon {
+        font-size: 4rem;
+        color: #dc3545;
+        margin-bottom: 20px;
+    }
+    
+    .delete-card h1 {
+        color: #dc3545;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+    
+    .delete-card p {
+        color: #555;
+        font-size: 1.1rem;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+    
+    .delete-card .category-name {
+        font-weight: 700;
+        color: #333;
+    }
+    
+    .delete-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-delete:hover {
+        background: #c82333;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220,53,69,0.3);
+    }
+    
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-cancel:hover {
+        background: #5a6268;
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(108,117,125,0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid pt-5">
+    <div class="row px-xl-5">
+        <div class="col-12">
+            <nav class="breadcrumb bg-light mb-30">
+                <a class="breadcrumb-item text-dark" href="{% url 'index' %}">Home</a>
+                <a class="breadcrumb-item text-dark" href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
+                <span class="breadcrumb-item active">Delete Category</span>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="warning-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h1>Delete Category</h1>
+        <p>
+            Are you sure you want to delete the category 
+            <span class="category-name">"{{ category.category_name }}"</span>?
+        </p>
+        <p class="text-muted">
+            <small>This action cannot be undone. All products in this category may be affected.</small>
+        </p>
+        
+        <form method="post" style="display: inline;">
+            {% csrf_token %}
+            <div class="delete-actions">
+                <button type="submit" class="btn-delete">
+                    <i class="fas fa-trash mr-2"></i>Yes, Delete Category
+                </button>
+                <a href="{% url 'admin_dashboard' %}" class="btn-cancel">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

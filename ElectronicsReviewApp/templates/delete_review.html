@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Review - {{ review.product.product_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid pt-5">
+    <div class="row px-xl-5">
+        <div class="col-lg-6 mx-auto">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb bg-light mb-4">
+                <a class="breadcrumb-item text-dark" href="{% url 'index' %}">Home</a>
+                <a class="breadcrumb-item text-dark" href="{% url 'product_detail' review.product.id %}">{{ review.product.product_name }}</a>
+                <span class="breadcrumb-item active">Delete Review</span>
+            </nav>
+
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Delete Review</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Warning Message -->
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Warning:</strong> This action cannot be undone. Are you sure you want to delete this review?
+                    </div>
+
+                    <!-- Review Details -->
+                    <div class="review-details p-3 bg-light rounded mb-4">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6><strong>Product:</strong> {{ review.product.product_name }}</h6>
+                                <p><strong>Reviewer:</strong> {{ review.user.username }}</p>
+                                <p><strong>Rating:</strong> 
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-muted"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    ({{ review.rating }}/5)
+                                </p>
+                                <p><strong>Comment:</strong></p>
+                                <p class="text-muted">{{ review.comment }}</p>
+                                <small class="text-muted">Posted on {{ review.created_at|date:"F d, Y" }}</small>
+                            </div>
+                            <div class="col-md-4">
+                                {% if review.product.product_image %}
+                                    <img src="{{ review.product.product_image.url }}" alt="{{ review.product.product_name }}" class="img-fluid rounded">
+                                {% else %}
+                                    <img src="{% static 'img/default-product.jpg' %}" alt="{{ review.product.product_name }}" class="img-fluid rounded">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confirmation Form -->
+                    <form method="post" class="text-center">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-lg mr-3">
+                            <i class="fas fa-trash"></i> Yes, Delete Review
+                        </button>
+                        <a href="{% url 'product_detail' review.product.id %}" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

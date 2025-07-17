@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.category_name }} - Electronics Review{% endblock %}
+
+{% block keywords %}Electronics, {{ category.category_name }}, Products{% endblock %}
+
+{% block description %}Browse {{ category.category_name }} products at Electronics Review{% endblock %}
+
+{% block extra_css %}
+<style>
+    .category-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 10px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .category-img-container {
+        width: 150px;
+        height: 150px;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 3px solid #dee2e6;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .category-img-container img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    
+    .category-info h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 15px;
+    }
+    
+    .category-info p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+    
+    .product-img {
+        height: 250px;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+    }
+    
+    .product-img img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+    
+    .product-item:hover .product-img img {
+        transform: scale(1.05);
+    }
+    
+    .product-item {
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .product-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .product-action {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .product-item:hover .product-action {
+        opacity: 1;
+    }
+    
+    .no-products {
+        padding: 80px 0;
+        text-align: center;
+        background: #f8f9fa;
+        border-radius: 10px;
+        margin: 30px 0;
+    }
+    
+    .no-products i {
+        color: #6c757d;
+        margin-bottom: 20px;
+    }
+    
+    .no-products h3 {
+        color: #495057;
+        margin-bottom: 15px;
+    }
+    
+    .no-products p {
+        color: #6c757d;
+        margin-bottom: 25px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <!-- Breadcrumb Start -->
+    <div class="container-fluid pt-5">
+        <div class="row px-xl-5">
+            <div class="col-12">
+                <nav class="breadcrumb bg-light mb-30">
+                    <a class="breadcrumb-item text-dark" href="{% url 'index' %}">Home</a>
+                    <a class="breadcrumb-item text-dark" href="{% url 'categories' %}">Categories</a>
+                    <span class="breadcrumb-item active">{{ category.category_name }}</span>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- Category Header Start -->
+    <div class="container-fluid">
+        <div class="row px-xl-5">
+            <div class="col-12">
+                <div class="category-header">
+                    <div class="d-flex align-items-center">
+                        <div class="category-img-container">
+                            {% if category.category_image %}
+                                <img class="img-fluid" src="{{ category.category_image.url }}" alt="{{ category.category_name }}">
+                            {% else %}
+                                <i class="fas fa-box-open fa-4x text-muted"></i>
+                            {% endif %}
+                        </div>
+                        <div class="category-info ml-4">
+                            <h1>{{ category.category_name }}</h1>
+                            {% if category.category_description %}
+                                <p class="text-muted mb-2">{{ category.category_description }}</p>
+                            {% endif %}
+                            <p class="text-primary mb-0 font-weight-bold">{{ product_count }} Product{% if product_count != 1 %}s{% endif %} Available</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Category Header End -->
+
+    <!-- Products Start -->
+    <div class="container-fluid pb-5">
+        <div class="row px-xl-5">
+            {% for product in products %}
+            <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+                <div class="product-item bg-light mb-4">
+                    <div class="product-img position-relative overflow-hidden">
+                        {% if product.product_image %}
+                            <img class="img-fluid" src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                        {% else %}
+                            <img class="img-fluid" src="{% static 'img/default-product.jpg' %}" alt="{{ product.product_name }}">
+                        {% endif %}
+                        <div class="product-action">
+                            <a class="btn btn-outline-dark btn-square" href="{% url 'product_detail' product.id %}#tab-pane-2"><i class="fa fa-star"></i></a>
+                            <!-- <a class="btn btn-outline-dark btn-square" href="#"><i class="far fa-heart"></i></a> -->
+                            <a class="btn btn-outline-dark btn-square" href="#"><i class="fa fa-sync-alt"></i></a>
+                            <a class="btn btn-outline-dark btn-square" href="{% url 'product_detail' product.id %}"><i class="fa fa-search"></i></a>
+                        </div>
+                    </div>
+                    <div class="text-center py-4">
+                        <a class="h6 text-decoration-none text-truncate" href="{% url 'product_detail' product.id %}">{{ product.product_name }}</a>
+                        <div class="d-flex align-items-center justify-content-center mt-2">
+                            <h5>${{ product.product_price }}</h5>
+                        </div>
+                        {% if product.product_details %}
+                            <p class="text-muted small mt-2">{{ product.product_details|truncatewords:15 }}</p>
+                        {% endif %}
+                        <div class="d-flex align-items-center justify-content-center mb-1">
+                            {% with rating=product.get_average_rating %}
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= rating %}
+                                        <small class="fas fa-star text-primary mr-1"></small>
+                                    {% elif forloop.counter|add:"-1" < rating %}
+                                        <small class="fas fa-star-half-alt text-primary mr-1"></small>
+                                    {% else %}
+                                        <small class="far fa-star text-primary mr-1"></small>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                            <small>({{ product.get_rating_count }})</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="no-products">
+                    <i class="fas fa-box-open fa-5x"></i>
+                    <h3>No Products Found</h3>
+                    <p>There are no products in the {{ category.category_name }} category yet.</p>
+                    <a href="{% url 'categories' %}" class="btn btn-primary btn-lg">Browse Other Categories</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- Products End -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Handle review button clicks to ensure proper tab switching
+    $(document).ready(function() {
+        // Add click handler for review star buttons
+        $('a[href*="#tab-pane-2"]').click(function(e) {
+            e.preventDefault();
+            var productUrl = $(this).attr('href').split('#')[0];
+            // Store the tab preference in sessionStorage
+            sessionStorage.setItem('openReviewsTab', 'true');
+            // Navigate to the product page
+            window.location.href = productUrl;
+        });
+    });
+</script>
+{% endblock %}

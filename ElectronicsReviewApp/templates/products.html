@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Products - Electronics Review{% endblock %}
+
+{% block keywords %}Electronics Products, Tech Products, Product Listings{% endblock %}
+
+{% block description %}Browse our complete collection of electronics products{% endblock %}
+
+{% block extra_css %}
+<style>
+    .category-filter-item {
+        padding: 10px 15px;
+        margin: 5px 0;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+    
+    .category-filter-item.active {
+        background-color: #007bff;
+        color: white !important;
+    }
+    
+    .category-filter-item.active .badge {
+        background-color: white !important;
+        color: #007bff !important;
+    }
+    
+    .category-filter-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+    
+    .category-filter-item.active:hover {
+        background-color: #0056b3;
+    }
+    
+    .product-img {
+        height: 250px;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    
+    .product-img img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+    
+    .product-item:hover .product-img img {
+        transform: scale(1.05);
+    }
+    
+    .product-action {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .product-item:hover .product-action {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Products Page Content Start -->
+    <div class="container-fluid pt-5">
+        <!-- Page Header -->
+        <div class="row px-xl-5">
+            <div class="col-12">
+                <nav class="breadcrumb bg-light mb-30">
+                    <a class="breadcrumb-item text-dark" href="{% url 'index' %}">Home</a>
+                    <span class="breadcrumb-item active">Products</span>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Products Section -->
+        <div class="row px-xl-5">
+            <div class="col-lg-3 col-md-4">
+                <!-- Filter by Category -->
+                <h5 class="section-title position-relative text-uppercase mb-3">
+                    <span class="bg-secondary pr-3">Filter by Category</span>
+                </h5>
+                <div class="bg-light p-4 mb-30">
+                    <div class="category-filter-item d-flex align-items-center justify-content-between mb-2 {% if not selected_category %}active{% endif %}">
+                        <div class="d-flex align-items-center">
+                            {% if not selected_category %}
+                                <i class="fas fa-check-circle mr-2"></i>
+                            {% else %}
+                                <i class="far fa-circle text-muted mr-2"></i>
+                            {% endif %}
+                            <a href="{% url 'products' %}" class="text-decoration-none {% if not selected_category %}text-white{% else %}text-dark{% endif %}">
+                                <span class="font-weight-{% if not selected_category %}bold{% else %}normal{% endif %}">All Categories</span>
+                            </a>
+                        </div>
+                        <span class="badge {% if not selected_category %}bg-white text-primary{% else %}border text-dark{% endif %} font-weight-normal">{{ products.count }}</span>
+                    </div>
+                    {% for category in categories %}
+                    <div class="category-filter-item d-flex align-items-center justify-content-between mb-2 {% if selected_category == category.id|stringformat:"s" %}active{% endif %}">
+                        <div class="d-flex align-items-center">
+                            {% if selected_category == category.id|stringformat:"s" %}
+                                <i class="fas fa-check-circle mr-2"></i>
+                            {% else %}
+                                <i class="far fa-circle text-muted mr-2"></i>
+                            {% endif %}
+                            <a href="{% url 'products' %}?category={{ category.id }}" class="text-decoration-none {% if selected_category == category.id|stringformat:"s" %}text-white{% else %}text-dark{% endif %}">
+                                <span class="font-weight-{% if selected_category == category.id|stringformat:"s" %}bold{% else %}normal{% endif %}">{{ category.category_name }}</span>
+                            </a>
+                        </div>
+                        <span class="badge {% if selected_category == category.id|stringformat:"s" %}bg-white text-primary{% else %}border text-dark{% endif %} font-weight-normal">{{ category.product_set.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="col-lg-9 col-md-8">
+                <div class="row pb-3">
+                    <div class="col-12 pb-1">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <div>
+                                <h1 class="section-title position-relative text-uppercase mb-0">
+                                    <span class="bg-secondary pr-3">All Products</span>
+                                </h1>
+                            </div>
+                            <div class="ml-2">
+                                <div class="btn-group">
+                                    <select class="form-control" id="sort-select">
+                                        <option value="">Sort by</option>
+                                        <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                                        <option value="price-low" {% if current_sort == 'price-low' %}selected{% endif %}>Price: Low to High</option>
+                                        <option value="price-high" {% if current_sort == 'price-high' %}selected{% endif %}>Price: High to Low</option>
+                                        <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest First</option>
+                                        <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                                        <option value="rating-high" {% if current_sort == 'rating-high' %}selected{% endif %}>Highest Rated</option>
+                                        <option value="rating-low" {% if current_sort == 'rating-low' %}selected{% endif %}>Lowest Rated</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Search Results Info -->
+                    {% if search_query %}
+                    <div class="col-12 pb-1">
+                        <div class="alert alert-info">
+                            <i class="fas fa-search mr-2"></i>
+                            <strong>Search Results for "{{ search_query }}"</strong> - {{ products.count }} product{{ products.count|pluralize }} found
+                            <a href="{% url 'products' %}" class="btn btn-sm btn-outline-primary ml-3">
+                                <i class="fas fa-times mr-1"></i>Clear Search
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Products Grid -->
+                    {% for product in products %}
+                    <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
+                        <div class="product-item bg-light mb-4">
+                            <div class="product-img position-relative overflow-hidden">
+                                {% if product.product_image %}
+                                    <img class="img-fluid" src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                                {% else %}
+                                    <img class="img-fluid" src="{% static 'img/default-product.jpg' %}" alt="{{ product.product_name }}">
+                                {% endif %}
+                                <div class="product-action">
+                                    <a class="btn btn-outline-dark btn-square" href="{% url 'product_detail' product.id %}#tab-pane-2"><i class="fa fa-star"></i></a>
+                                    <!-- <a class="btn btn-outline-dark btn-square" href="#"><i class="far fa-heart"></i></a> -->
+                                    <a class="btn btn-outline-dark btn-square" href="#"><i class="fa fa-sync-alt"></i></a>
+                                    <a class="btn btn-outline-dark btn-square" href="{% url 'product_detail' product.id %}"><i class="fa fa-search"></i></a>
+                                </div>
+                            </div>
+                            <div class="text-center py-4">
+                                <a class="h6 text-decoration-none text-truncate" href="{% url 'product_detail' product.id %}">{{ product.product_name }}</a>
+                                <div class="d-flex align-items-center justify-content-center mt-2">
+                                    <h5>${{ product.product_price }}</h5>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center mb-1">
+                                    {% with rating=product.get_average_rating %}
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= rating %}
+                                                <small class="fas fa-star text-primary mr-1"></small>
+                                            {% elif forloop.counter|add:"-1" < rating %}
+                                                <small class="fas fa-star-half-alt text-primary mr-1"></small>
+                                            {% else %}
+                                                <small class="far fa-star text-primary mr-1"></small>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endwith %}
+                                    <small>({{ product.get_rating_count }})</small>
+                                </div>
+                                {% if product.product_category %}
+                                    <small class="text-muted">{{ product.product_category.category_name }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-box-open fa-4x text-muted mb-4"></i>
+                            <h3 class="text-muted">No Products Available</h3>
+                            <p class="text-muted">Products will appear here once they are added.</p>
+                            <a href="{% url 'index' %}" class="btn btn-primary btn-lg">Back to Home</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Products Page Content End -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Sort functionality (basic implementation)
+    document.getElementById('sort-select').addEventListener('change', function() {
+        var sortValue = this.value;
+        // For now, just reload the page - in a real app, you'd use AJAX
+        if (sortValue) {
+            var url = new URL(window.location);
+            url.searchParams.set('sort', sortValue);
+            window.location = url;
+        }
+    });
+
+    // Handle review button clicks to ensure proper tab switching
+    $(document).ready(function() {
+        // Add click handler for review star buttons
+        $('a[href*="#tab-pane-2"]').click(function(e) {
+            e.preventDefault();
+            var productUrl = $(this).attr('href').split('#')[0];
+            // Store the tab preference in sessionStorage
+            sessionStorage.setItem('openReviewsTab', 'true');
+            // Navigate to the product page
+            window.location.href = productUrl;
+        });
+    });
+</script>
+{% endblock %}

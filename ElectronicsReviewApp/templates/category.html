@@ -1,0 +1,38 @@
+{% load static %}
+<!-- Categories Component Start -->
+<div class="container-fluid pt-5">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Categories</span></h2>
+    <div class="row px-xl-5 pb-3">
+        {% for item in categories_with_counts %}
+        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+            <a class="text-decoration-none" href="{% url 'category_detail' item.category.id %}">
+                <div class="cat-item img-zoom d-flex align-items-center mb-4">
+                    <div class="overflow-hidden" style="width: 100px; height: 100px;">
+                        {% if item.category.category_image %}
+                            <img class="img-fluid" src="{{ item.category.category_image.url }}" alt="{{ item.category.category_name }}" style="width: 100px; height: 100px; object-fit: cover;">
+                        {% else %}
+                            <img class="img-fluid" src="{% static 'img/default-category.jpg' %}" alt="{{ item.category.category_name }}" style="width: 100px; height: 100px; object-fit: cover;">
+                        {% endif %}
+                    </div>
+                    <div class="flex-fill pl-3">
+                        <h6>{{ item.category.category_name }}</h6>
+                        <small class="text-body">{{ item.product_count }} Product{% if item.product_count != 1 %}s{% endif %}</small>
+                        {% if item.category.category_description %}
+                            <p class="text-muted small mt-1">{{ item.category.category_description|truncatewords:6 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-box-open fa-2x text-muted mb-3"></i>
+                <h4 class="text-muted">No Categories Available</h4>
+                <p class="text-muted">Categories will appear here once they are added.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<!-- Categories Component End -->

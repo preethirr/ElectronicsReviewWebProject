@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Categories - Electronics Review{% endblock %}
+
+{% block keywords %}Electronics Categories, Tech Categories, Product Categories{% endblock %}
+
+{% block description %}Browse our electronics categories to find the best tech products{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cat-item {
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .cat-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .cat-img-container {
+        width: 120px;
+        height: 120px;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+    }
+    
+    .cat-img-container img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+    
+    .cat-item:hover .cat-img-container img {
+        transform: scale(1.05);
+    }
+    
+    .cat-item h5 {
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+    
+    .cat-item small {
+        display: block;
+        margin-bottom: 8px;
+    }
+    
+    .cat-item p {
+        font-size: 13px;
+        line-height: 1.4;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Categories Page Content Start -->
+    <div class="container-fluid pt-5">
+        <!-- Page Header -->
+        <div class="row px-xl-5">
+            <div class="col-12">
+                <nav class="breadcrumb bg-light mb-30">
+                    <a class="breadcrumb-item text-dark" href="{% url 'index' %}">Home</a>
+                    <span class="breadcrumb-item active">Categories</span>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Categories Section -->
+        <div class="row px-xl-5">
+            <div class="col-12">
+                <h1 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
+                    <span class="bg-secondary pr-3">Electronics Categories</span>
+                </h1>
+            </div>
+        </div>
+        
+        <!-- Categories Grid -->
+        <div class="row px-xl-5 pb-3">
+            {% for item in categories_with_counts %}
+            <div class="col-lg-4 col-md-6 col-sm-12 pb-1">
+                <a class="text-decoration-none" href="{% url 'category_detail' item.category.id %}">
+                    <div class="cat-item img-zoom d-flex align-items-center mb-4 p-4 bg-light">
+                        <div class="cat-img-container">
+                            {% if item.category.category_image %}
+                                <img class="img-fluid" src="{{ item.category.category_image.url }}" alt="{{ item.category.category_name }}">
+                            {% else %}
+                                <img class="img-fluid" src="{% static 'img/default-category.jpg' %}" alt="{{ item.category.category_name }}">
+                            {% endif %}
+                        </div>
+                        <div class="flex-fill pl-4">
+                            <h5 class="text-primary">{{ item.category.category_name }}</h5>
+                            <small class="text-body"><strong>{{ item.product_count }} Product{% if item.product_count != 1 %}s{% endif %}</strong></small>
+                            {% if item.category.category_description %}
+                                <p class="text-muted mt-2 mb-0">{{ item.category.category_description|truncatewords:15 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-box-open fa-4x text-muted mb-4"></i>
+                    <h3 class="text-muted">No Categories Available</h3>
+                    <p class="text-muted">Categories will appear here once they are added by the admin.</p>
+                    <a href="{% url 'index' %}" class="btn btn-primary btn-lg">Back to Home</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- Categories Page Content End -->
+{% endblock %}

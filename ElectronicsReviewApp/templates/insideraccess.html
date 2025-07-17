@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - Electronics Review{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .stats-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        text-align: center;
+        margin-bottom: 2rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    .stats-card i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-card h3 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+    
+    .stats-card p {
+        color: #666;
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .admin-menu {
+        margin-bottom: 2rem;
+    }
+    
+    .admin-menu .btn {
+        margin: 0.5rem;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .admin-menu .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .admin-section {
+        background: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+    }
+    
+    .admin-section h3 {
+        color: #333;
+        margin-bottom: 1.5rem;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #007bff;
+        font-weight: 600;
+    }
+    
+    .table {
+        margin-bottom: 0;
+    }
+    
+    .table th {
+        background: #f8f9fa;
+        border-top: none;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .badge {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+    
+    .admin-actions {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .admin-actions .btn {
+        margin: 0.5rem;
+        padding: 12px 24px;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1><i class="fas fa-tachometer-alt me-3"></i>Admin Dashboard</h1>
+                <p class="mb-0">Welcome, {{ user.username }}! Manage your Electronics Review store.</p>
+            </div>
+            <div class="col-lg-4 text-end">
+                <span class="badge bg-light text-dark">
+                    {% if user.is_superuser %}
+                        <i class="fas fa-crown me-1"></i>Superuser
+                    {% else %}
+                        <i class="fas fa-user-tie me-1"></i>Staff
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <i class="fas fa-boxes text-primary"></i>
+                <h3>{{ products.count }}</h3>
+                <p>Total Products</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <i class="fas fa-list text-success"></i>
+                <h3>{{ categories.count }}</h3>
+                <p>Categories</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <i class="fas fa-envelope text-info"></i>
+                <h3>{{ newsletter_count|default:0 }}</h3>
+                <p>Newsletter Subscribers</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <i class="fas fa-star text-warning"></i>
+                <h3>{{ reviews_count|default:0 }}</h3>
+                <p>Total Reviews</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="admin-actions">
+        <a href="{% url 'product_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus mr-2"></i>Add Product
+        </a>
+        <a href="{% url 'category_create' %}" class="btn btn-success">
+            <i class="fas fa-plus mr-2"></i>Add Category
+        </a>
+        <a href="{% url 'products' %}" class="btn btn-info">
+            <i class="fas fa-eye mr-2"></i>View Store
+        </a>
+    </div>
+
+    <!-- Categories Section -->
+    <div class="admin-section">
+        <h3><i class="fas fa-list mr-2"></i>Categories Management</h3>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Category Name</th>
+                        <th>Description</th>
+                        <th>Image</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <td>{{ category.id }}</td>
+                        <td>{{ category.category_name }}</td>
+                        <td>{{ category.category_description|truncatewords:10 }}</td>
+                        <td>
+                            {% if category.category_image %}
+                                <img src="{{ category.category_image.url }}" alt="{{ category.category_name }}" 
+                                     style="width: 50px; height: 50px; object-fit: contain; border-radius: 5px; border: 1px solid #ddd;">
+                            {% else %}
+                                <span class="text-muted">No Image</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'category_update' category.id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="{% url 'category_delete' category.id %}" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No categories found yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="admin-section">
+        <h3><i class="fas fa-boxes mr-2"></i>Products Management</h3>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Details</th>
+                        <th>Image</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.product_name }}</td>
+                        <td>{{ product.product_category.category_name }}</td>
+                        <td>${{ product.product_price }}</td>
+                        <td>{{ product.product_details|truncatewords:8 }}</td>
+                        <td>
+                            {% if product.product_image %}
+                                <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" 
+                                     style="width: 60px; height: 60px; object-fit: contain; border-radius: 5px; border: 1px solid #ddd;">
+                            {% else %}
+                                <span class="text-muted">No Image</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'product_update' product.id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="{% url 'product_delete' product.id %}" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">No products found yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

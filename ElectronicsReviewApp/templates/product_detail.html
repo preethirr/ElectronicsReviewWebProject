@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.product_name }} - Electronics Review{% endblock %}
+
+{% block keywords %}{{ product.product_name }}, Electronics, Review, {{ product.product_category.category_name }}{% endblock %}
+
+{% block description %}{{ product.product_details|truncatewords:20 }}{% endblock %}
+
+{% block content %}
+    <!-- Product Detail Start -->
+    <div class="container-fluid pt-5">
+        <!-- Breadcrumb -->
+        <div class="row px-xl-5">
+            <div class="col-12">
+                <nav class="breadcrumb bg-light mb-30">
+                    <a class="breadcrumb-item text-dark" href="{% url 'index' %}">Home</a>
+                    <a class="breadcrumb-item text-dark" href="{% url 'categories' %}">Categories</a>
+                    {% if product.product_category %}
+                        <a class="breadcrumb-item text-dark" href="{% url 'category_detail' product.product_category.id %}">{{ product.product_category.category_name }}</a>
+                    {% endif %}
+                    <span class="breadcrumb-item active">{{ product.product_name }}</span>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Product Detail -->
+        <div class="row px-xl-5">
+            <div class="col-lg-5 mb-30">
+                <div class="product-img position-relative overflow-hidden">
+                    {% if product.product_image %}
+                        <img class="img-fluid w-100" src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                    {% else %}
+                        <img class="img-fluid w-100" src="{% static 'img/default-product.jpg' %}" alt="{{ product.product_name }}">
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-lg-7 h-auto mb-30">
+                <div class="h-100 bg-light p-30">
+                    <h3>{{ product.product_name }}</h3>
+                    <div class="d-flex mb-3">
+                        <div class="text-primary mr-2">
+                            <!-- Star Rating Display -->
+                            {% with rating=average_rating %}
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= rating %}
+                                        <small class="fas fa-star"></small>
+                                    {% elif forloop.counter|add:"-1" < rating %}
+                                        <small class="fas fa-star-half-alt"></small>
+                                    {% else %}
+                                        <small class="far fa-star"></small>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                        <small class="pt-1">
+                            {% if rating_count > 0 %}
+                                ({{ rating_count }} Review{{ rating_count|pluralize }})
+                            {% else %}
+                                (No Reviews)
+                            {% endif %}
+                        </small>
+                    </div>
+                    <h3 class="font-weight-semi-bold mb-4">${{ product.product_price }}</h3>
+                    <p class="mb-4">{{ product.product_details|linebreaks }}</p>
+                    
+                    {% if product.product_category %}
+                        <div class="d-flex mb-3">
+                            <strong class="text-dark mr-3">Category:</strong>
+                            <span>{{ product.product_category.category_name }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="d-flex mb-4">
+                        <strong class="text-dark mr-3">Added:</strong>
+                        <span>{{ product.product_created_at|date:"M d, Y" }}</span>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-4 pt-2">
+                        <button class="btn btn-primary px-3" onclick="goToReviews()">
+                            <i class="fa fa-star mr-1"></i> Write a Review
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Product Detail Tabs -->
+    <div class="container-fluid py-5">
+        <div class="row px-xl-5">
+            <div class="col">
+                <div class="bg-light p-30">
+                    <div class="nav nav-tabs mb-4">
+                        <a class="nav-item nav-link text-dark active" data-toggle="tab" href="#tab-pane-1">Description</a>
+                        <a class="nav-item nav-link text-dark" data-toggle="tab" href="#tab-pane-2">Reviews ({{ rating_count }})</a>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="tab-pane-1">
+                            <h4 class="mb-3">Product Description</h4>
+                            <p>{{ product.product_details|linebreaks }}</p>
+                        </div>
+                        <div class="tab-pane fade" id="tab-pane-2">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h4 class="mb-4">{{ rating_count }} review{{ rating_count|pluralize }} for "{{ product.product_name }}"</h4>
+                                    
+                                    <!-- Reviews List -->
+                                    {% for review in reviews %}
+                                    <div class="media mb-4">
+                                        <div class="media-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6>{{ review.user.username|capfirst }}<small> - <i>{{ review.created_at|date:"M d, Y" }}</i></small></h6>
+                                                    <div class="text-primary mb-2">
+                                                        {% for i in "12345" %}
+                                                            {% if forloop.counter <= review.rating %}
+                                                                <i class="fas fa-star"></i>
+                                                            {% else %}
+                                                                <i class="far fa-star"></i>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                    <p>{{ review.comment|linebreaks }}</p>
+                                                </div>
+                                                {% if user.is_superuser %}
+                                                    <div class="btn-group" role="group">
+                                                        <a href="{% url 'edit_review' review.id %}" class="btn btn-outline-primary btn-sm" title="Edit Review">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="{% url 'delete_review' review.id %}" class="btn btn-outline-danger btn-sm" title="Delete Review">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <p>No reviews yet. Be the first to review this product!</p>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h4 class="mb-4">Leave a review</h4>
+                                    
+                                    {% if user.is_authenticated %}
+                                        {% if user_review %}
+                                            <div class="alert alert-info">
+                                                <strong>You have already reviewed this product.</strong>
+                                                <div class="mt-2">
+                                                    <div class="text-primary mb-2">
+                                                        {% for i in "12345" %}
+                                                            {% if forloop.counter <= user_review.rating %}
+                                                                <i class="fas fa-star"></i>
+                                                            {% else %}
+                                                                <i class="far fa-star"></i>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                    <p>{{ user_review.comment }}</p>
+                                                    <small class="text-muted">Posted on {{ user_review.created_at|date:"M d, Y" }}</small>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <div class="form-group">
+                                                    <label for="rating-select">Your Rating *</label>
+                                                    {{ form.rating }}
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="comment">Your Review *</label>
+                                                    {{ form.comment }}
+                                                </div>
+                                                <div class="form-group mb-0">
+                                                    <input type="submit" value="Submit Review" class="btn btn-primary px-3">
+                                                </div>
+                                            </form>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="alert alert-warning">
+                                            <strong>Please <a href="{% url 'login' %}">login</a> to write a review.</strong>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Related Products (Optional) -->
+    <div class="container-fluid py-5">
+        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
+            <span class="bg-secondary pr-3">You May Also Like</span>
+        </h2>
+        <div class="row px-xl-5">
+            {% for related_product in product.product_category.product_set.all|slice:":4" %}
+                {% if related_product != product %}
+                <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+                    <div class="product-item bg-light mb-4">
+                        <div class="product-img position-relative overflow-hidden">
+                            {% if related_product.product_image %}
+                                <img class="img-fluid w-100" src="{{ related_product.product_image.url }}" alt="{{ related_product.product_name }}" style="height: 250px; object-fit: cover;">
+                            {% else %}
+                                <img class="img-fluid w-100" src="{% static 'img/default-product.jpg' %}" alt="{{ related_product.product_name }}" style="height: 250px; object-fit: cover;">
+                            {% endif %}
+                            <div class="product-action">
+                                <a class="btn btn-outline-dark btn-square" href="#"><i class="fa fa-shopping-cart"></i></a>
+                                <a class="btn btn-outline-dark btn-square" href="#"><i class="fa fa-sync-alt"></i></a>
+                                <a class="btn btn-outline-dark btn-square" href="{% url 'product_detail' related_product.id %}"><i class="fa fa-search"></i></a>
+                            </div>
+                        </div>
+                        <div class="text-center py-4">
+                            <a class="h6 text-decoration-none text-truncate" href="{% url 'product_detail' related_product.id %}">{{ related_product.product_name }}</a>
+                            <div class="d-flex align-items-center justify-content-center mt-2">
+                                <h5>${{ related_product.product_price }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <!-- Product Detail End -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Check if we should open the reviews tab automatically
+        if (sessionStorage.getItem('openReviewsTab') === 'true') {
+            // Switch to reviews tab
+            $('a[href="#tab-pane-2"]').tab('show');
+            
+            // Scroll to the tabs section
+            setTimeout(function() {
+                $('html, body').animate({
+                    scrollTop: $('.nav-tabs').offset().top - 50
+                }, 800);
+            }, 100);
+            
+            // Clear the flag
+            sessionStorage.removeItem('openReviewsTab');
+        }
+    });
+    
+    // Function to go to reviews section
+    function goToReviews() {
+        // Switch to reviews tab
+        $('a[href="#tab-pane-2"]').tab('show');
+        
+        // Scroll to the tabs section (find the nav-tabs container)
+        $('html, body').animate({
+            scrollTop: $('.nav-tabs').offset().top - 50
+        }, 800);
+    }
+    
+    // Quantity controls (if needed later)
+    $('.btn-plus').click(function() {
+        var quantity = parseInt($(this).closest('.quantity').find('input').val());
+        $(this).closest('.quantity').find('input').val(quantity + 1);
+    });
+    
+    $('.btn-minus').click(function() {
+        var quantity = parseInt($(this).closest('.quantity').find('input').val());
+        if (quantity > 1) {
+            $(this).closest('.quantity').find('input').val(quantity - 1);
+        }
+    });
+</script>
+{% endblock %}

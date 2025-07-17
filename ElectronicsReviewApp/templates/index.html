@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Electronics Review - Your Tech Shopping Destination{% endblock %}
+
+{% block keywords %}Electronics, Reviews, Tech, Gadgets, Shopping{% endblock %}
+
+{% block description %}Electronics Review - Find the best tech products with honest reviews and competitive prices{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-img {
+        height: 250px;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    
+    .product-img img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+    
+    .product-item:hover .product-img img {
+        transform: scale(1.05);
+    }
+    
+    .product-action {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .product-item:hover .product-action {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+
+    <!-- Carousel Start -->
+    <div class="container-fluid mb-3">
+        <div class="row px-xl-5">
+            <div class="col-lg-8">
+                <div id="header-carousel" class="carousel slide carousel-fade mb-30 mb-lg-0" data-ride="carousel">
+                    <ol class="carousel-indicators">
+                        <li data-target="#header-carousel" data-slide-to="0" class="active"></li>
+                        <li data-target="#header-carousel" data-slide-to="1"></li>
+                        <li data-target="#header-carousel" data-slide-to="2"></li>
+                    </ol>
+                    <div class="carousel-inner">
+                        <div class="carousel-item position-relative active" style="height: 430px;">
+                            <img class="position-absolute w-100 h-100" src="{% static 'img/carousel-1.jpg' %}" style="object-fit: cover;">
+                            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                                <div class="p-3" style="max-width: 700px;">
+                                    <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Latest Smartphones</h1>
+                                    <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Discover the newest smartphones with cutting-edge technology, amazing cameras, and powerful performance</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-item position-relative" style="height: 430px;">
+                            <img class="position-absolute w-100 h-100" src="{% static 'img/carousel-2.jpg' %}" style="object-fit: cover;">
+                            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                                <div class="p-3" style="max-width: 700px;">
+                                    <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Premium Laptops</h1>
+                                    <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Find high-performance laptops for work, gaming, and creativity with detailed reviews and specifications</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-item position-relative" style="height: 430px;">
+                            <img class="position-absolute w-100 h-100" src="{% static 'img/carousel-3.jpg' %}" style="object-fit: cover;">
+                            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                                <div class="p-3" style="max-width: 700px;">
+                                    <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Gaming Gear</h1>
+                                    <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Level up your gaming experience with top-rated gaming peripherals, consoles, and accessories</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="product-offer mb-30" style="height: 200px;">
+                    <img class="img-fluid" src="{% static 'img/offer-1.jpg' %}" alt="">
+                    <div class="offer-text">
+                        <h6 class="text-white text-uppercase">Expert Reviews</h6>
+                        <h3 class="text-white mb-3">Trusted Insights</h3>
+                    </div>
+                </div>
+                <div class="product-offer mb-30" style="height: 200px;">
+                    <img class="img-fluid" src="{% static 'img/offer-2.jpg' %}" alt="">
+                    <div class="offer-text">
+                        <h6 class="text-white text-uppercase">Latest Tech</h6>
+                        <h3 class="text-white mb-3">Unbiased Reviews</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Carousel End -->
+
+
+    <!-- Categories Start -->
+    {% include 'category.html' %}
+    <!-- Categories End -->
+
+
+    <!-- Products Start -->
+    <div class="container-fluid pt-5 pb-3">
+        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Featured Products</span></h2>
+        <div class="row px-xl-5">
+            {% for product in featured_products %}
+            <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+                <div class="product-item bg-light mb-4">
+                    <div class="product-img position-relative overflow-hidden">
+                        {% if product.product_image %}
+                            <img class="img-fluid" src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                        {% else %}
+                            <img class="img-fluid" src="{% static 'img/default-product.jpg' %}" alt="{{ product.product_name }}">
+                        {% endif %}
+                        <div class="product-action">
+                            <a class="btn btn-outline-dark btn-square" href="{% url 'product_detail' product.id %}#tab-pane-2"><i class="fa fa-star"></i></a>
+                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
+                            <a class="btn btn-outline-dark btn-square" href="{% url 'product_detail' product.id %}"><i class="fa fa-search"></i></a>
+                        </div>
+                    </div>
+                    <div class="text-center py-4">
+                        <a class="h6 text-decoration-none text-truncate" href="{% url 'product_detail' product.id %}">{{ product.product_name }}</a>
+                        <div class="d-flex align-items-center justify-content-center mt-2">
+                            <h5>${{ product.product_price }}</h5>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center mb-1">
+                            {% with rating=product.get_average_rating %}
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= rating %}
+                                        <small class="fas fa-star text-primary mr-1"></small>
+                                    {% elif forloop.counter|add:"-1" < rating %}
+                                        <small class="fas fa-star-half-alt text-primary mr-1"></small>
+                                    {% else %}
+                                        <small class="far fa-star text-primary mr-1"></small>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                            <small>({{ product.get_rating_count }})</small>
+                        </div>
+                        {% if product.product_category %}
+                            <small class="text-muted">{{ product.product_category.category_name }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <h4 class="text-muted">No Products Available</h4>
+                    <p class="text-muted">Products will appear here once they are added.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- Products End -->
+
+
+    <!-- Offer Start -->
+    <div class="container-fluid pt-5 pb-3">
+        <div class="row px-xl-5">
+            <div class="col-md-6">
+                <div class="product-offer mb-30" style="height: 300px;">
+                    <img class="img-fluid" src="{% static 'img/offer-1.jpg' %}" alt="">
+                    <div class="offer-text">
+                        <h6 class="text-white text-uppercase">In-Depth Analysis</h6>
+                        <h3 class="text-white mb-3">Tech Decoded</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="product-offer mb-30" style="height: 300px;">
+                    <img class="img-fluid" src="{% static 'img/offer-2.jpg' %}" alt="">
+                    <div class="offer-text">
+                        <h6 class="text-white text-uppercase">Real User Reviews</h6>
+                        <h3 class="text-white mb-3">Honest Feedback</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Offer End -->
+
+
+    <!-- Products Start -->
+    <div class="container-fluid pt-5 pb-3">
+        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Recent Products</span></h2>
+        <div class="row px-xl-5">
+            {% for product in recent_products %}
+            <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+                <div class="product-item bg-light mb-4">
+                    <div class="product-img position-relative overflow-hidden">
+                        {% if product.product_image %}
+                            <img class="img-fluid" src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                        {% else %}
+                            <img class="img-fluid" src="{% static 'img/default-product.jpg' %}" alt="{{ product.product_name }}">
+                        {% endif %}
+                        <div class="product-action">
+                            <a class="btn btn-outline-dark btn-square" href="{% url 'product_detail' product.id %}#tab-pane-2"><i class="fa fa-star"></i></a>
+                            <!-- <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a> -->
+                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
+                            <a class="btn btn-outline-dark btn-square" href="{% url 'product_detail' product.id %}"><i class="fa fa-search"></i></a>
+                        </div>
+                    </div>
+                    <div class="text-center py-4">
+                        <a class="h6 text-decoration-none text-truncate" href="{% url 'product_detail' product.id %}">{{ product.product_name }}</a>
+                        <div class="d-flex align-items-center justify-content-center mt-2">
+                            <h5>${{ product.product_price }}</h5>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center mb-1">
+                            {% with rating=product.get_average_rating %}
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= rating %}
+                                        <small class="fas fa-star text-primary mr-1"></small>
+                                    {% elif forloop.counter|add:"-1" < rating %}
+                                        <small class="fas fa-star-half-alt text-primary mr-1"></small>
+                                    {% else %}
+                                        <small class="far fa-star text-primary mr-1"></small>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                            <small>({{ product.get_rating_count }})</small>
+                        </div>
+                        {% if product.product_category %}
+                            <small class="text-muted">{{ product.product_category.category_name }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <h4 class="text-muted">No Recent Products Available</h4>
+                    <p class="text-muted">Recent products will appear here once more are added.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- Products End -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Handle review button clicks to ensure proper tab switching
+    $(document).ready(function() {
+        // Add click handler for review star buttons
+        $('a[href*="#tab-pane-2"]').click(function(e) {
+            e.preventDefault();
+            var productUrl = $(this).attr('href').split('#')[0];
+            // Store the tab preference in sessionStorage
+            sessionStorage.setItem('openReviewsTab', 'true');
+            // Navigate to the product page
+            window.location.href = productUrl;
+        });
+    });
+</script>
+{% endblock %}
